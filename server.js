@@ -1,14 +1,27 @@
 const express = require('express')
+const mongoose = require('mongoose')
+const beerRouter = require('./routes/beerRouter')
 const app = express()
 
-console.log('This runs on startup')
+app.use(express.urlencoded({ extended: true }))
+app.use(express.json())
 
-// Middleware
-app.get('/test', (req, res) => {
-    console.log(req)
-    res.send('Hello!')
+app.use('/beers', beerRouter)
+
+app.use('/', (req, res) => {
+    res.send('Welcome to the Beer API!')
 })
 
-app.listen(4444, () => {
-    console.log('Listening on port 4444...')
+const port = process.env.PORT || 4444
+
+mongoose.connect('mongodb://localhost:27017/beers', { useNewUrlParser: true })
+mongoose.connection.on('connected', () => {
+    console.log('Connected to beers DB')
+})
+mongoose.connection.on('error', (err) => {
+    console.log(err)
+})
+
+app.listen(port, () => {
+    console.log(`Listening on port ${port}`)
 })
